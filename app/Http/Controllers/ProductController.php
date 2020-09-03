@@ -15,6 +15,7 @@ use Bukashk0zzz\YmlGenerator\Model\ShopInfo;
 use Bukashk0zzz\YmlGenerator\Settings;
 use Bukashk0zzz\YmlGenerator\Generator;
 use Faker;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -29,22 +30,24 @@ class ProductController extends Controller
 
         //Log::info("Shop {$domain}'s object:" . json_encode($shop));
         //Log::info("Shop {$domain}'s API objct:" . json_encode($shopApi));
-        $guid = $this->get_xml_guid();
+        $guid = $this->get_xml_guid($domain);
         $yml_link = config('app.url').'/yml?guid='.$guid;
+        $this->generator($domain);
         return view('home', compact('yml_link'));
     }
 
-    private function get_xml_guid() {
-        return md5('test');
-
+    private function get_xml_guid($domain) {
+        $str = config('shopify-app.api_key').$domain;
+        return md5($str);
     }
 
-    public function generator () {
+    private function generator ($domain) {
         $this->faker = Faker\Factory::create();
         //$this->faker = new Faker\Generator();
 
         // $file = tempnam(sys_get_temp_dir(), 'YMLGenerator');
-        $file = 'd:/tmp/generator.xml';
+        $file = Storage::disk('local')->path($this->get_xml_guid($domain).'.xml');
+        Log::info($file);
         $settings = (new Settings())
             ->setOutputFile($file)
             ->setEncoding('UTF-8')
@@ -99,6 +102,6 @@ class ProductController extends Controller
             $offers,
             $deliveries
         );
-        return view('test');
+        //return view('test');
     }
 }

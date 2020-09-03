@@ -23,5 +23,5 @@ Route::get('/preferences', function () {
     return view('welcome');
 })->middleware(['auth.shopify'])->name('preferences');
 Route::get('/test', 'ProductController@index')->middleware(['auth.shopify'])->name('test');
-Route::get('/generator', 'ProductController@generator')->middleware(['auth.shopify'])->name('generator');
+// Route::get('/generator', 'ProductController@generator')->middleware(['auth.shopify'])->name('generator');
 Route::get('/yml', 'FeedController@index')->name('yml');
