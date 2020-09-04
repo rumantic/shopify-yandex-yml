@@ -25,14 +25,19 @@ class ProductController extends Controller
         $shop = Auth::user();
         $domain = $shop->getDomain()->toNative();
         Log::info("Shop {$domain} call");
+        Log::info(print_r($shop->getToken(), true));
 
-        //$shopApi = $shop->api()->rest('GET', '/admin/products.json');
+        $shopApi = $shop->api()->rest('GET', '/admin/products.json');
 
         //Log::info("Shop {$domain}'s object:" . json_encode($shop));
-        //Log::info("Shop {$domain}'s API objct:" . json_encode($shopApi));
+        Log::info("Shop {$domain}'s API objct:" . json_encode($shopApi));
         $guid = $this->get_xml_guid($domain);
         $yml_link = config('app.url').'/yml?guid='.$guid;
         $this->generator($domain);
+        //Установка guid
+        $shop->guid = $guid;
+        $shop->save();
+
         return view('home', compact('yml_link'));
     }
 
