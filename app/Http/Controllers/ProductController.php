@@ -30,10 +30,10 @@ class ProductController extends Controller
         $shopApi = $shop->api()->rest('GET', '/admin/products.json');
 
         //Log::info("Shop {$domain}'s object:" . json_encode($shop));
-        Log::info("Shop {$domain}'s API objct:" . json_encode($shopApi));
+        Log::info("Shop {$domain}'s API objct:" . json_encode($shopApi['body']['products']));
         $guid = $this->get_xml_guid($domain);
         $yml_link = config('app.url').'/yml?guid='.$guid;
-        $this->generator($domain);
+        $this->generator($domain, $shopApi['body']['products']);
         //Установка guid
         $shop->guid = $guid;
         $shop->save();
@@ -46,7 +46,7 @@ class ProductController extends Controller
         return md5($str);
     }
 
-    private function generator ($domain) {
+    private function generator ($domain, $products) {
         $this->faker = Faker\Factory::create();
         //$this->faker = new Faker\Generator();
 
@@ -81,16 +81,18 @@ class ProductController extends Controller
 
         // Creating offers array (https://yandex.ru/support/webmaster/goods-prices/technical-requirements.xml#offers)
         $offers = [];
-        $offers[] = (new OfferSimple())
-            ->setId(12346)
-            ->setAvailable(true)
-            ->setUrl('http://www.best.seller.com/product_page.php?pid=12348')
-            ->setPrice($this->faker->numberBetween(1, 9999))
-            ->setCurrencyId('USD')
-            ->setCategoryId(1)
-            ->setDelivery(false)
-            ->setName('Best product ever')
-        ;
+        foreach ( $products as $product ) {
+            $offers[] = (new OfferSimple())
+                ->setId($product['id'])
+                ->setAvailable(true)
+                ->setUrl('http://www.best.seller.com/product_page.php?pid=12348')
+                ->setPrice($this->faker->numberBetween(1, 9999))
+                ->setCurrencyId('USD')
+                ->setCategoryId(1)
+                ->setDelivery(false)
+                ->setName($product['title'])
+            ;
+        }
 
         // Optional creating deliveries array (https://yandex.ru/support/partnermarket/elements/delivery-options.xml)
         $deliveries = [];

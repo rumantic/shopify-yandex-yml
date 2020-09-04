@@ -15,12 +15,13 @@ class FeedController extends Controller
         $guid = $request->get('guid');
 
         $shop = User::where('guid', $request->get('guid'))->firstOrFail();
+        $result = $shop->api()->rest('GET', '/admin/products.json');
+        Log::info(json_encode($result['body']['products']));
+
         return response(Storage::get($guid.'.xml'), 200, [
             'Content-Type' => 'application/xml'
         ]);
 
-        $result = $shop->api()->rest('GET', '/admin/products.json');
-        Log::info(json_encode($result));
 
         return view('test');
     }
